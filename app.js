@@ -6,7 +6,7 @@ const donations = require('./models/donations')
 
 app.get("/", (req, res) => res.type('html').send(html));
 app.post('/save-payment', async (req, res) => {
-  console.log(req.body)
+  return res.json(req.body)
 })
 
 mongoose.connect('mongodb+srv://olaolatick:alagbakoku2mo@cluster0.mihf9.mongodb.net/?retryWrites=true&w=majority',
