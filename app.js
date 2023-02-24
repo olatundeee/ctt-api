@@ -1,8 +1,26 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3001;
+const mongoose = require("mongoose");
+const donations = require('./models/donations')
 
 app.get("/", (req, res) => res.type('html').send(html));
+app.post('/save-payment', async (req, res) => {
+  console.log(req.body)
+})
+
+mongoose.connect('mongodb+srv://olaolatick:alagbakoku2mo@cluster0.mihf9.mongodb.net/?retryWrites=true&w=majority',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }
+);
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error: "));
+db.once("open", function () {
+  console.log("Connected successfully");
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
