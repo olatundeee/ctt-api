@@ -21,7 +21,7 @@ app.post('/save-payment', async (req, res) => {
   
   try {
     await donationObj.save();
-    res.send(donationObj);
+    res.send({donationObj, success: true});
   } catch (error) {
     response.status(500).send(error);
   }
