@@ -68,19 +68,17 @@ app.post('/run-hivepay', async (req, res) => {
     })
     if (verifyTransaction.data.verify_hivepay) {
       let paymentObj = {};
-        paymentObj.name = req.body.payment_details.buyer;
-        paymentObj.hiveUsername = req.body.payment_details.buyer;
-        paymentObj.email = req.body.merchant_email;
-        paymentObj.donationAmountInDollars = req.body.amount;
-        paymentObj.donationAmountInCrypto = req.body.payment_details.token_amount;
-        paymentObj.paymentOption = 'hivepay';
+      paymentObj.name = req.body.payment_details.buyer;
+      paymentObj.hiveUsername = req.body.payment_details.buyer;
+      paymentObj.email = req.body.merchant_email;
+      paymentObj.donationAmountInDollars = req.body.amount;
+      paymentObj.donationAmountInCrypto = req.body.payment_details.token_amount;
+      paymentObj.paymentOption = 'hivepay';
 
-        const savePayment = await axios.post(`https://ctt-api.onrender.com/save-payment`, paymentObj)
-
-        if (savePayment.data.success) {
-          console.log('hivepay payment saved')
-          return;
-        }
+      const donationObj = new donations(payment);
+      const savePayment = await donationObj.save();
+      console.log(savePayment)
+      return;
     }
   } catch (error) {
     console.log(error)

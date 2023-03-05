@@ -5,7 +5,6 @@ const axios = require('axios')
 const runLightningConfirm = async () => {
     console.log('starting')
     const pendingPaymentsList = await pendingPayments.find();
-    console.log('pending', pendingPaymentsList);
     pendingPaymentsList.forEach(async (ment) => {
         const hash = ment.transactionId
         try {
