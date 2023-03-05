@@ -2,17 +2,21 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 3001;
 const mongoose = require("mongoose");
+const cors = require("cors")
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const runLightningConfirm = require('./confirmLightningPayments')
 
 // db models
 const donations = require('./models/donations')
+const pendingPayments = require('./models/pendingPayments')
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors())
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get("/", (req, res) => res.type('html').send('CTT API'));
@@ -23,7 +27,8 @@ app.post('/save-payment', async (req, res) => {
     await donationObj.save();
     res.send({donationObj, success: true});
   } catch (error) {
-    response.status(500).send(error);
+    console.log(error)
+    res.status(500).send(error);
   }
 })
 app.get('/all-donations', async (req, res) => {
@@ -35,6 +40,19 @@ app.get('/all-donations', async (req, res) => {
     response.status(500).send(error);
   }
 })
+app.post('/save-pending-payment', async (req, res) => {
+  const pendingPaymentsObj = new pendingPayments(req.body);
+  
+  try {
+    await pendingPaymentsObj.save();
+    res.send({pendingPaymentsObj, success: true});
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error);
+  }
+})
+
+
 
 mongoose.connect('mongodb+srv://olaolatick:alagbakoku2mo@cluster0.mihf9.mongodb.net/?retryWrites=true&w=majority',
   {
@@ -50,4 +68,10 @@ db.once("open", function () {
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+// confirm ligthning payments
+setInterval(function() {
+  runLightningConfirm()
+}, 300000)
+
 
