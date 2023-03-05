@@ -75,7 +75,7 @@ app.post('/run-hivepay', async (req, res) => {
       paymentObj.donationAmountInCrypto = req.body.payment_details.token_amount;
       paymentObj.paymentOption = 'hivepay';
 
-      const donationObj = new donations(payment);
+      const donationObj = new donations(paymentObj);
       const savePayment = await donationObj.save();
       console.log(savePayment)
       return;
