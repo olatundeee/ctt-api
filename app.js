@@ -66,7 +66,22 @@ app.post('/run-hivepay', async (req, res) => {
       fee: req.body.payment_details.fee,
       amount_received: req.body.payment_details.amount_received
     })
-    console.log(verifyTransaction)
+    if (verifyTransaction.data.verify_hivepay) {
+      let paymentObj = {};
+        paymentObj.name = req.body.payment_details.buyer;
+        paymentObj.hiveUsername = req.body.payment_details.buyer;
+        paymentObj.email = req.body.merchant_email;
+        paymentObj.donationAmountInDollars = req.body.amount;
+        paymentObj.donationAmountInCrypto = req.body.payment_details.token_amount;
+        paymentObj.paymentOption = 'hivepay';
+
+        const savePayment = await axios.post(`/save-payment`, paymentObj)
+
+        if (savePayment.data.success) {
+          console.log('hivepay payment saved')
+          return;
+        }
+    }
   } catch (error) {
     console.log(error)
   }
