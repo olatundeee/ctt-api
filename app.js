@@ -55,7 +55,9 @@ app.post('/run-hivepay', async (req, res) => {
   console.log(req.body)
 })
 
-
+app.post('/hivepay-cancel', async (req, res) => {
+  console.log(req.body)
+})
 
 mongoose.connect('mongodb+srv://olaolatick:alagbakoku2mo@cluster0.mihf9.mongodb.net/?retryWrites=true&w=majority',
   {
