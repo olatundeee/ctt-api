@@ -6,7 +6,8 @@ const cors = require("cors")
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const runLightningConfirm = require('./confirmLightningPayments')
+const runLightningConfirm = require('./confirmLightningPayments');
+const axios = require('axios');
 
 // db models
 const donations = require('./models/donations')
@@ -52,7 +53,23 @@ app.post('/save-pending-payment', async (req, res) => {
   }
 })
 app.post('/run-hivepay', async (req, res) => {
-  console.log(req.body)
+  try {
+    console.log(req.body)
+    const verifyTransaction = await axios.post('https://api.hivepay.io', {
+      version: 2,
+      ipn_verification: true,
+      txid: req.body.payment_details.txid,
+      merchant: req.body.payment_details.merchant,
+      buyer: req.body.payment_details.buyer,
+      token: req.body.payment_details.token,
+      token_amount: req.body.payment_details.token_amount,
+      fee: req.body.payment_details.fee,
+      amount_received: req.body.payment_details.amount_received
+    })
+    console.log(verifyTransaction)
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 app.post('/hivepay-cancel', async (req, res) => {
