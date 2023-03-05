@@ -75,7 +75,7 @@ app.post('/run-hivepay', async (req, res) => {
         paymentObj.donationAmountInCrypto = req.body.payment_details.token_amount;
         paymentObj.paymentOption = 'hivepay';
 
-        const savePayment = await axios.post(`/save-payment`, paymentObj)
+        const savePayment = await axios.post(`https://ctt-api.onrender.com/save-payment`, paymentObj)
 
         if (savePayment.data.success) {
           console.log('hivepay payment saved')
