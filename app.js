@@ -18,9 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors())
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.get("/", (req, res) => res.type('html').send('CTT API'));
 app.post('/save-payment', async (req, res) => {
   const donationObj = new donations(req.body);
   
@@ -31,16 +29,27 @@ app.post('/save-payment', async (req, res) => {
     console.log(error)
     res.status(500).send(error);
   }
-})
+});
+
 app.get('/all-donations', async (req, res) => {
-  
+  console.log('tryna')
   try {
     const donationObj = await donations.find();
-    res.send(donationObj);
+    /*donationObj.forEach(async o => {
+      oObj = o.toObject()
+      await donations.findOneAndDelete(o);
+      
+      console.log('bitch gone', donationObj.indexOf(o));
+    })*/
+    console.log(donationObj.length)
+    return res.json(donationObj);
   } catch (error) {
-    response.status(500).send(error);
+    console.log(error)
+    res.send(error);
   }
-})
+});
+
+
 app.post('/save-pending-payment', async (req, res) => {
   const pendingPaymentsObj = new pendingPayments(req.body);
   
@@ -89,6 +98,12 @@ app.post('/hivepay-cancel', async (req, res) => {
   console.log(req.body)
 })
 
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/build', 'index.html'));
+});
+
 mongoose.connect('mongodb+srv://olaolatick:alagbakoku2mo@cluster0.mihf9.mongodb.net/?retryWrites=true&w=majority',
   {
     useNewUrlParser: true,
@@ -105,8 +120,8 @@ db.once("open", function () {
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 // confirm ligthning payments
-setInterval(function() {
+//setInterval(function() {
   runLightningConfirm()
-}, 300000)
+//}, 300000)
 
 
