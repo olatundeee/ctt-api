@@ -120,8 +120,8 @@ db.once("open", function () {
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 // confirm ligthning payments
-//setInterval(function() {
+setInterval(function() {
   runLightningConfirm()
-//}, 300000)
+}, 300000)
 
 
