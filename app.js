@@ -87,7 +87,7 @@ app.post('/run-hivepay', async (req, res) => {
 
       const findDonation = await donations.findOne(paymentObj);
 
-      if (!paymentObj) { 
+      if (!findDonation) { 
         const donationObj = new donations(paymentObj);
         const savePayment = await donationObj.save();
         console.log(savePayment)
