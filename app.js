@@ -84,6 +84,7 @@ app.post('/run-hivepay', async (req, res) => {
       paymentObj.donationAmountInDollars = req.body.amount;
       paymentObj.donationAmountInCrypto = req.body.payment_details.token_amount;
       paymentObj.paymentOption = 'hivepay';
+      paymenntObj.message = req.body.description;
 
       const findDonation = await donations.findOne(paymentObj);
 

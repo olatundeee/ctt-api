@@ -43,7 +43,8 @@ const DonationSchema = new mongoose.Schema({
     type: String,
     required: true,
     default: 'days'
-  }
+  },
+  message: { type: String }
 });
 
 const Donation = mongoose.model("Donation", DonationSchema);

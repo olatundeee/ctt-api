@@ -47,7 +47,8 @@ const PendingPaymentsSchema = new mongoose.Schema({
   transactionId: {
     type: String,
     required: true
-  }
+  },
+  message: { type: String }
 });
 
 const PendingPayments = mongoose.model("PendingPayments", PendingPaymentsSchema);

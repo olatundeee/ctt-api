@@ -9,7 +9,7 @@ const runLightningConfirm = async () => {
     console.log('await pendingPayments.find()', pendingPaymentsList.length);
 
     pendingPaymentsList.forEach(async (ment) => {
-        await pendingPayments.findOneAndDelete(ment);
+        //await pendingPayments.findOneAndDelete(ment);
         const hash = ment.transactionId
         try {
             const checkStatus = await axios.get(`https://api.v4v.app/v1/check_invoice/${hash}`)
