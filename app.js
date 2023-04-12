@@ -33,6 +33,8 @@ app.post('/save-payment', async (req, res) => {
 
 app.get('/all-donations', async (req, res) => {
   console.log('tryna')
+  let donationsRes = []
+
   try {
     const donationObj = await donations.find();
     /*donationObj.forEach(async o => {
@@ -40,9 +42,35 @@ app.get('/all-donations', async (req, res) => {
       await donations.findOneAndDelete(o);
       
       console.log('bitch gone', donationObj.indexOf(o));
-    })*/
-    console.log(donationObj.length)
-    return res.json(donationObj);
+    })
+    console.log(donationObj);*/
+    donationObj.forEach(async (oneDonation) => {
+
+      const checkCumulativeDonation = async (e) => {
+        return e.name = oneDonation.name
+      }
+
+      const cumDonationArr = await donationObj.filter(checkCumulativeDonation);
+
+      let cumDonation = 0
+
+      await cumDonationArr.forEach(async d => {
+        cumDonation += d.donationAmountInDollars;
+      })
+
+      const theDonation = oneDonation.toObject()
+
+      theDonation.totalDonated = cumDonation
+
+      await donationsRes.push(theDonation)
+
+      if (donationObj.indexOf(oneDonation) === donationObj.indexOf(donationObj[donationObj.length - 1])) {
+        console.log(donationsRes, 'laitilai')
+        return res.json(donationsRes);
+      }
+    })
+
+    
   } catch (error) {
     console.log(error)
     res.send(error);
