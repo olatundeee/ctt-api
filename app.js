@@ -21,13 +21,13 @@ app.use(cors())
 
 app.post('/save-payment', async (req, res) => {
   const donationObj = new donations(req.body);
-  
+  console.log(req.body)
   try {
     await donationObj.save();
-    res.send({donationObj, success: true});
+    return res.json({donationObj, success: true});
   } catch (error) {
     console.log(error)
-    res.status(500).send(error);
+    return res.status(500).send(error);
   }
 });
 
@@ -37,7 +37,16 @@ app.get('/all-donations', async (req, res) => {
 
   try {
     const donationObj = await donations.find();
-    return res.json(donationObj)
+    donationObj.forEach(async o => {
+      let don = o.toObject() 
+      don.created = o._id.getTimestamp().toString()
+      donationsRes.push(don)
+
+      if (o === donationObj[donationObj.length - 1]) {
+        return res.json(donationsRes.reverse())
+      }
+    })
+    
     /*donationObj.forEach(async o => {
       oObj = o.toObject()
       await donations.findOneAndDelete(o);
