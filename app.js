@@ -7,14 +7,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const runLightningConfirm = require('./confirmLightningPayments');
+const runCoinbaseConfirm = require('./confirmCoinbasePayments');
 const axios = require('axios');
-var BlockBee = require('@blockbee/api')
+var coinbase = require('coinbase-commerce-node');
+var Client = coinbase.Client;
 
-const BTC_ADDRESS = 'bc1qcv96mfxt7qa0urvqc25u693rs9shx5he9l20sq';
-const ETH_ADDRESS = '0x239BFF11B5267e1e6859f44133073A0932Cda555';
+Client.init('a9cff71d-7993-4ba5-80f6-71eb90a8a554');
 
-const BLOCK_BEE_KEY = 'hyOmHGjSbBt1fCSH0R1CWXzB1HdvK432uzDxW7jiCdgEHPI8Icx0alHXFCTyLMLT';
-
+var Charge = coinbase.resources.Charge;
 
 // db models
 const donations = require('./models/donations')
@@ -79,40 +79,27 @@ app.get('/all-cum-donations', async (req, res) => {
 
 app.post('/handle_btc_eth', async (req, res) => {
   try {
-    //const host = req.get('host');
-    const host = 'https://ctt-api.onrender.com'
-    const cryptApiCallback = `${host}/block_bee/callback?data=${encodeURIComponent(req.body)}`;
-    const myAddress = req.body.paymentOption === 'btc' ? BTC_ADDRESS : ETH_ADDRESS;
-
-    const query = new URLSearchParams({
-      apikey: BLOCK_BEE_KEY,
-      callback: cryptApiCallback,
-      address: myAddress,
-      pending: '0',
-      confirmations: '0',
-      post: '0',
-      priority: 'string',
-      multi_token: '0',
-      multi_chain: '0',
-      convert: '0'
-    }).toString();
-
-    const ticker = req.body.paymentOption;
-    const resp = await axios.get(
-      `https://api.blockbee.io/${ticker}/create/?${query}`,
-      {method: 'GET'}
-    );
-
-    const data = await resp.text();
-    console.log(data);
+    const orderData = {
+      name: req.body.name,
+      description: 'Donation to CTTPodcast',
+      pricing_type: 'fixed_price',
+      local_price: {
+        amount: req.body.donationAmountInDollars,
+        currency: 'USD'
+      }
+    };
+    
+    const order = await Charge.create(orderData);
+    const pendingPaymentsObj = new pendingPayments(req.body);
+    pendingPaymentsObj.transactionId = order.id
+    await pendingPaymentsObj.save();
+    return res.json({pendingPaymentsObj, success: true, url: order.hosted_url});
   } catch (error) {
     console.log(error)
   }
 })
 
-app.get('/block_bee/callback', async (req, res) => {
-  console.log(req.query);
-})
+
 
 
 app.post('/save-pending-payment', async (req, res) => {
@@ -193,8 +180,12 @@ db.once("open", function () {
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 // confirm ligthning payments
-//setInterval(function() {
-  runLightningConfirm()
-//}, 300000)
+setInterval(function() {
+  runLightningConfirm();
+  runCoinbaseConfirm();
+}, 300000)
+
+
+
 
 

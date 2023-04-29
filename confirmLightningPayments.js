@@ -22,7 +22,7 @@ const runLightningConfirm = async () => {
                 console.log('ment deleted', pendingPaymentsList.length)
             }
         } catch (error) {
-            //console.log(error)
+            console.log('error')
         }    
     })
 } 
