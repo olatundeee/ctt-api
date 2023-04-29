@@ -44,7 +44,10 @@ const DonationSchema = new mongoose.Schema({
     required: true,
     default: 'days'
   },
-  message: { type: String }
+  message: { type: String },
+  donorCity: { type: String },
+  donorState: { type: String },
+  donorCountry: { type: String }
 });
 
 const Donation = mongoose.model("Donation", DonationSchema);
