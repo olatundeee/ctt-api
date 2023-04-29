@@ -80,7 +80,7 @@ app.get('/all-cum-donations', async (req, res) => {
 app.post('/handle_btc_eth', async (req, res) => {
   try {
     //const host = req.get('host');
-    const host = 'ctt-api.onrender.com'
+    const host = 'https://ctt-api.onrender.com'
     const cryptApiCallback = `${host}/block_bee/callback?data=${encodeURIComponent(req.body)}`;
     const myAddress = req.body.paymentOption === 'btc' ? BTC_ADDRESS : ETH_ADDRESS;
 
