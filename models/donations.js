@@ -46,8 +46,7 @@ const DonationSchema = new mongoose.Schema({
   },
   message: { type: String },
   donorCity: { type: String },
-  donorState: { type: String },
-  donorCountry: { type: String }
+  donorState: { type: String }
 });
 
 const Donation = mongoose.model("Donation", DonationSchema);

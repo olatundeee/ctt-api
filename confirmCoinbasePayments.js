@@ -20,8 +20,10 @@ const runCoinbaseConfirm = async () => {
         const hash = ment.transactionId
         try {
             const checkStatus = await Charge.retrieve(hash);
-            console.log(checkStatus.timeline[0].status)
-            if (checkStatus.timeline[0].status === 'COMPLETED') {const payment = ment.toObject();
+            //console.log(checkStatus.timeline[0].status)
+            if (checkStatus.timeline[0].status === 'COMPLETED') {
+                const payment = ment.toObject();
+                delete payment.transactionId;
                 const donationObj = new donations(payment);
                 const savePayment = await donationObj.save();
                 console.log("savePayment")

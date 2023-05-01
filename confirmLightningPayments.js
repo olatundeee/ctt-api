@@ -15,6 +15,7 @@ const runLightningConfirm = async () => {
             const checkStatus = await axios.get(`https://api.v4v.app/v1/check_invoice/${hash}`)
             if (checkStatus.data && checkStatus.data.settled) {
                 const payment = ment.toObject();
+                delete payment.transactionId;
                 const donationObj = new donations(payment);
                 const savePayment = await donationObj.save();
                 console.log("savePayment")
@@ -22,7 +23,7 @@ const runLightningConfirm = async () => {
                 console.log('ment deleted', pendingPaymentsList.length)
             }
         } catch (error) {
-            console.log('error')
+            //console.log('error')
         }    
     })
 } 
