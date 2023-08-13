@@ -50,7 +50,8 @@ const PendingPaymentsSchema = new mongoose.Schema({
   },
   message: { type: String },
   donorCity: { type: String },
-  donorState: { type: String }
+  donorState: { type: String },
+  donationJingle: { type: String }
 });
 
 const PendingPayments = mongoose.model("PendingPayments", PendingPaymentsSchema);
