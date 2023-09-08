@@ -26,6 +26,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors())
 
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/build', 'index.html'));
+});
+
 app.post('/save-payment', async (req, res) => {
   const donationObj = new donations(req.body);
   console.log(req.body)
@@ -157,12 +163,6 @@ app.post('/run-hivepay', async (req, res) => {
 app.post('/hivepay-cancel', async (req, res) => {
   console.log(req.body)
 })
-
-app.use(express.static(path.join(__dirname, 'build')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '/build', 'index.html'));
-});
 
 mongoose.connect('mongodb+srv://olaolatick:alagbakoku2mo@cluster0.mihf9.mongodb.net/?retryWrites=true&w=majority',
   {
