@@ -28,10 +28,6 @@ app.use(cors())
 
 app.use(express.static(path.join(__dirname, 'build')));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '/build', 'index.html'));
-});
-
 app.post('/save-payment', async (req, res) => {
   const donationObj = new donations(req.body);
   console.log(req.body)
@@ -175,6 +171,10 @@ const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error: "));
 db.once("open", function () {
   console.log("Connected successfully");
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build/index.html'));
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
