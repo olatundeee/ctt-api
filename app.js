@@ -11,14 +11,18 @@ const runCoinbaseConfirm = require('./confirmCoinbasePayments');
 const axios = require('axios');
 var coinbase = require('coinbase-commerce-node');
 var Client = coinbase.Client;
+const mailer = require('./mailer');
+const emailBody = require('./templateBody');
+const emailSubject = 'CTTPodcast Payment Confirmation and Receipt';
 
 Client.init('a9cff71d-7993-4ba5-80f6-71eb90a8a554');
 
 var Charge = coinbase.resources.Charge;
 
 // db models
-const donations = require('./models/donations')
-const pendingPayments = require('./models/pendingPayments')
+const donations = require('./models/donations');
+const pendingPayments = require('./models/pendingPayments');
+const sendEmail = require("./mailer");
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -32,8 +36,10 @@ app.post('/save-payment', async (req, res) => {
   const donationObj = new donations(req.body);
   console.log(req.body)
   try {
-    await donationObj.save();
-    return res.json({donationObj, success: true});
+    const theDonation = await donationObj.save();
+    const sendMail = await mailer(theDonation.email, emailSubject, emailBody(theDonation))
+    console.log(sendMail);
+    return res.json({donationObj: theDonation, success: true});
   } catch (error) {
     console.log(error)
     return res.status(500).send(error);
@@ -62,6 +68,22 @@ app.get('/all-donations', async (req, res) => {
       
       console.log('bitch gone', donationObj.indexOf(o));
     })*/
+
+    
+  } catch (error) {
+    console.log(error)
+    res.send(error);
+  }
+});
+
+app.post('/one-donation', async (req, res) => {
+
+  try {
+    let donationObj = await donations.findOne({_id: req.body.donationId});
+    let don = donationObj.toObject() 
+    don.created = donationObj._id.getTimestamp().toString()
+      
+    return res.json(don)
 
     
   } catch (error) {
@@ -108,13 +130,31 @@ app.post('/save-pending-payment', async (req, res) => {
   const pendingPaymentsObj = new pendingPayments(req.body);
   
   try {
-    await pendingPaymentsObj.save();
-    res.send({pendingPaymentsObj, success: true});
+    const thePending = await pendingPaymentsObj.save();
+    res.send({pendingPaymentsObj: thePending, success: true});
   } catch (error) {
     console.log(error)
     res.status(500).send(error);
   }
 })
+
+
+
+app.post('/one-pending-donation', async (req, res) => {
+
+  try {
+    let donationObj = await pendingPayments.findOne({_id: req.body.donationId});
+    let don = donationObj.toObject() 
+    don.created = donationObj._id.getTimestamp().toString()
+      
+    return res.json(don)
+
+    
+  } catch (error) {
+    console.log(error)
+    res.send(error);
+  }
+});
 
 app.post('/run-hivepay', async (req, res) => {
   try {
@@ -145,6 +185,8 @@ app.post('/run-hivepay', async (req, res) => {
       if (!findDonation) { 
         const donationObj = new donations(paymentObj);
         const savePayment = await donationObj.save();
+        const sendMail = await mailer(savePayment.email, emailSubject, emailBody(savePayment))
+        console.log(sendMail);
         console.log(savePayment)
         return;
       }
