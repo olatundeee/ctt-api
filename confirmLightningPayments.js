@@ -6,6 +6,19 @@ const mailer = require('./mailer');
 const emailBody = require('./templateBody');
 const emailSubject = 'CTTPodcast Payment Confirmation and Receipt';
 
+
+const getCumu = async (name) => {
+  
+    const donationsRes = await donations.aggregate([
+      { $group: { _id: "$name", totalDonationAmount: { $sum: "$donationAmountInDollars" } } },
+      { $sort: { totalDonationAmount: -1 } }
+    ]);
+  
+    return donationsRes.find(s => {
+      return s._id === name
+    })
+}
+
 const runLightningConfirm = async () => {
     console.log('starting')
     const pendingPaymentsList = await pendingPayments.find();
@@ -22,7 +35,16 @@ const runLightningConfirm = async () => {
                 delete payment.transactionId;
                 const donationObj = new donations(payment);
                 const savePayment = await donationObj.save();
-                const sendMail = await mailer(savePayment.email, emailSubject, emailBody(savePayment))
+                const donorCumu = await getCumu(payment.name)
+                let statusText = '' 
+                if (donorCumu.totalDonationAmount > 32.9) statusText = 'Licensed'
+                if (donorCumu.totalDonationAmount > 199.9) statusText = 'Producer'
+                if (donorCumu.totalDonationAmount > 999.9) statusText = 'Knight'
+            
+                let don = savePayment.toObject();
+                don.status = statusText;
+            
+                const sendMail = await mailer(theDonation.email, emailSubject, emailBody(don))
                 console.log(sendMail);
                 console.log("savePayment")
                 await pendingPayments.findOneAndDelete(ment);

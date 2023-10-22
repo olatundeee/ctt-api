@@ -17,7 +17,7 @@ const generateTemplateBody = (paymentDetails) => {
                     <!-- Header -->
                     <tr>
                         <td bgcolor="#008080" style="padding: 10px; text-align: center; border-radius: 8px 8px 0 0;">
-                        <h2 style="color: #ffffff;">Thank You for Your Donation!</h2>
+                        <h2 style="color: #ffffff;">Thank you for your generous donation! Tune in to the next show to hear your message read out on the show and your jingle played</h2>
                         </td>
                     </tr>
                 
@@ -57,6 +57,14 @@ const generateTemplateBody = (paymentDetails) => {
                             <tr style="background-color: #f2f2f2;">
                             <td><strong>Donation Jingle:</strong></td>
                             <td>${paymentDetails.donationJingle}</td>
+                            </tr>
+                            <tr>
+                            <td><strong>Your Current Status:</strong></td>
+                            <td>${paymentDetails.status}</td>
+                            </tr>
+                            <tr style="background-color: #f2f2f2;">
+                            <td><strong>Custom Message:</strong></td>
+                            <td>${paymentDetails.message}</td>
                             </tr>
                         </table>
                         </td>

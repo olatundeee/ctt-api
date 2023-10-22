@@ -22,7 +22,18 @@ var Charge = coinbase.resources.Charge;
 // db models
 const donations = require('./models/donations');
 const pendingPayments = require('./models/pendingPayments');
-const sendEmail = require("./mailer");
+
+const getCumu = async (name) => {
+  
+  const donationsRes = await donations.aggregate([
+    { $group: { _id: "$name", totalDonationAmount: { $sum: "$donationAmountInDollars" } } },
+    { $sort: { totalDonationAmount: -1 } }
+  ]);
+
+  return donationsRes.find(s => {
+    return s._id === name
+  })
+}
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -37,7 +48,16 @@ app.post('/save-payment', async (req, res) => {
   console.log(req.body)
   try {
     const theDonation = await donationObj.save();
-    const sendMail = await mailer(theDonation.email, emailSubject, emailBody(theDonation))
+    const donorCumu = await getCumu(req.body.name)
+    let statusText = '' 
+    if (donorCumu.totalDonationAmount > 32.9) statusText = 'Licensed'
+    if (donorCumu.totalDonationAmount > 199.9) statusText = 'Producer'
+    if (donorCumu.totalDonationAmount > 999.9) statusText = 'Knight'
+
+    let don = theDonation.toObject();
+    don.status = statusText;
+
+    const sendMail = await mailer(theDonation.email, emailSubject, emailBody(don))
     console.log(sendMail);
     return res.json({donationObj: theDonation, success: true});
   } catch (error) {
@@ -64,7 +84,7 @@ app.get('/all-donations', async (req, res) => {
     
     /*donationObj.forEach(async o => {
       oObj = o.toObject()
-      await donations.findOneAndDelete(o);
+      if (o.name === 'Olatunde Oladunni' || o.name === 'Bet Swanky' || o.name === 'gotgame' || o.name === 'Barry Allen' || o.name === 'The Grinch') await donations.findOneAndDelete(o);
       
       console.log('bitch gone', donationObj.indexOf(o));
     })*/
@@ -185,7 +205,16 @@ app.post('/run-hivepay', async (req, res) => {
       if (!findDonation) { 
         const donationObj = new donations(paymentObj);
         const savePayment = await donationObj.save();
-        const sendMail = await mailer(savePayment.email, emailSubject, emailBody(savePayment))
+        const donorCumu = await getCumu(paymentObj.name)
+        let statusText = '' 
+        if (donorCumu.totalDonationAmount > 32.9) statusText = 'Licensed'
+        if (donorCumu.totalDonationAmount > 199.9) statusText = 'Producer'
+        if (donorCumu.totalDonationAmount > 999.9) statusText = 'Knight'
+    
+        let don = paymentObj.toObject();
+        don.status = statusText;
+    
+        const sendMail = await mailer(paymentObj.email, emailSubject, emailBody(don))
         console.log(sendMail);
         console.log(savePayment)
         return;
